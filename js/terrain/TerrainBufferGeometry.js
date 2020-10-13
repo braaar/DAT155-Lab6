@@ -20,8 +20,17 @@ export default class TerrainBufferGeometry extends PlaneBufferGeometry {
         this.height = height;
 
         if (heightmapImage) {
+            const heightmapData = Utilities.getHeightmapData(heightmapImage, numberOfSubdivisions+1);
 
-            // TODO: Implement.
+            for(let i = 0; i < heightmapData.length; i++) {
+                if((Math.floor(Math.random()*10)) < 2){
+                //this.attributes.position.setZ(i, this.attributes.position.getZ(i) + heightmapData[i] * height/5);
+                this.attributes.position.setY(i, heightmapData[i] * height);
+            } else {
+                    this.attributes.position.setY(i, heightmapData[i] * height);
+                }
+
+            }
 
         } else if (noiseFn !== null) {
 

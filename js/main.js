@@ -8,7 +8,7 @@ import {
     RepeatWrapping,
     DirectionalLight,
     Vector3,
-    AxesHelper,
+    AxesHelper, PlaneBufferGeometry, MeshBasicMaterial, MeshPhongMaterial
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -70,10 +70,37 @@ async function main() {
      *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
      */
     const heightmapImage = await Utilities.loadImage('resources/images/heightmap.png');
+    const directionalLight = new DirectionalLight(0xffffff, 1.0);
+    scene.add(directionalLight);
+
+    const terrainGeometry = new TerrainBufferGeometry({heightmapImage, width: 100, height: 10, numberOfSubdivisions: 128});
+
+    const texture1 = await new TextureLoader().load('resources/textures/grass_02.png');
+    texture1.wrapS = RepeatWrapping;
+    texture1.wrapT = RepeatWrapping;
+    texture1.repeat.set(4, 4);
+
+    const texture2 = new TextureLoader().load('resources/textures/rock_01.png');
+    texture2.wrapS = RepeatWrapping;
+    texture2.wrapT = RepeatWrapping;
+    texture2.repeat.set(4, 4);
+
+    const splatMap = new TextureLoader().load('resources/images/splatmap_01.png');
+    //const splatMapData = Utilities.getHeightmapData(splatMap);
+    const terrainMaterial = new TextureSplattingMaterial({
+        textures: [texture1, texture2],
+        splatMaps: [splatMap]});
+
+    const terrain = new Mesh(terrainGeometry, terrainMaterial);
+
+
+    const heightmapData = Utilities.getHeightmapData(heightmapImage, 13);
+
+    scene.add(terrain);
 
 
 
-    /**
+    /**{heightmapImage, null, 100, 100, 12, 12});
      * Add trees:
      */
 
