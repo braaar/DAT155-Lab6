@@ -8,7 +8,7 @@ import {
     RepeatWrapping,
     DirectionalLight,
     Vector3,
-    AxesHelper, PlaneBufferGeometry, MeshBasicMaterial, MeshPhongMaterial
+    AxesHelper, PlaneBufferGeometry, MeshBasicMaterial, MeshPhongMaterial, HemisphereLight, sRGBEncoding, Color
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -34,6 +34,9 @@ async function main() {
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
+    renderer.outputEncoding = sRGBEncoding;
+    //renderer.gammaOutput = true;
+    renderer.gammaFactor = 2.2;
 
     /**
      * Handle window resize:
@@ -71,8 +74,19 @@ async function main() {
      */
     const heightmapImage = await Utilities.loadImage('resources/images/heightmap.png');
     const directionalLight = new DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set( 75, 300, -75 );
+
+
     scene.add(directionalLight);
 
+    var hemiLight = new HemisphereLight( 0xffffff, 0x444444 , 0.1);
+    hemiLight.position.set( 0, 300, 0 );
+    scene.add( hemiLight );
+    /**
+    var dirLight = new DirectionalLight( 0xffffff , 0.1);
+    dirLight.position.set( 75, 300, -75 );
+    scene.add( dirLight );
+*/
     const terrainGeometry = new TerrainBufferGeometry({heightmapImage, width: 100, height: 10, numberOfSubdivisions: 128});
 
     const texture1 = await new TextureLoader().load('resources/textures/grass_02.png');
@@ -80,7 +94,7 @@ async function main() {
     texture1.wrapT = RepeatWrapping;
     texture1.repeat.set(4, 4);
 
-    const texture2 = new TextureLoader().load('resources/textures/rock_01.png');
+    const texture2 = new TextureLoader().load('resources/textures/snowy_rock_01.png');
     texture2.wrapS = RepeatWrapping;
     texture2.wrapT = RepeatWrapping;
     texture2.repeat.set(4, 4);
@@ -90,6 +104,8 @@ async function main() {
     const terrainMaterial = new TextureSplattingMaterial({
         textures: [texture1, texture2],
         splatMaps: [splatMap]});
+
+
 
     const terrain = new Mesh(terrainGeometry, terrainMaterial);
 
@@ -103,6 +119,29 @@ async function main() {
     /**{heightmapImage, null, 100, 100, 12, 12});
      * Add trees:
      */
+
+    /**
+     * Add 3D model
+     * @type {GLTFLoader}
+     */
+    let loader1 = new GLTFLoader();
+    loader1.load( 'resources/models/low_poly_barrel/scene.gltf', function ( gltf ) {
+
+
+        gltf.scene.scale.multiplyScalar(0.05);
+        gltf.scene.translateOnAxis(new Vector3(0.0, 1.0, 0.0), 5);
+        console.log(gltf.scene.children);
+
+        //gltf.scene.children[0].children[0].children[0].children[0].children[2].children[0].material.metalness = 0   ; //new Color (0.2, 0.2, 0.2);//mesh 1
+       // gltf.scene.children[0].children[0].children[0].children[0].children[2].children[1].material.emissive = new Color (0.2, 0.2, 0.2);//mesh 1
+        scene.add( gltf.scene );
+
+    }, undefined, function ( error ) {
+
+        console.error( error );
+
+    } );
+
 
     const loader = new GLTFLoader();
     loader.load(
