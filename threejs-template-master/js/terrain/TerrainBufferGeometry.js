@@ -21,7 +21,13 @@ export default class TerrainBufferGeometry extends PlaneBufferGeometry {
 
         if (heightmapImage) {
 
-            // TODO: Implement.
+            // get heightmap data
+            this.heightmap = Utilities.getHeightmapData(heightmapImage, numberOfSubdivisions + 1);
+
+            // assign Y-values
+            for (let i = 0; i < this.heightmap.length; i++) {
+                this.attributes.position.setY(i, this.heightmap[i] * this.height);
+            }
 
         } else if (noiseFn !== null) {
 
@@ -45,7 +51,7 @@ export default class TerrainBufferGeometry extends PlaneBufferGeometry {
             throw Error('Unable to create TerrainBufferGeometry, must receive heightmapImage or noise function.');
         }
 
-        // Recompute normals.
+        // recompute normals.
         this.computeVertexNormals();
     }
 
