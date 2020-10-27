@@ -21,12 +21,12 @@ import {
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
 
-import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
-import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
-import { GLTFLoader } from './loaders/GLTFLoader.js';
+import TextureSplattingMaterial from './entities/terrain/TextureSplattingMaterial.js';
+import TerrainBufferGeometry from './entities/terrain/TerrainBufferGeometry.js';
+import { GLTFLoader } from './lib/loaders/GLTFLoader.js';
 import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
-import StarrySkyShader from "./materials/StarrySkyShader.js";
+import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -129,7 +129,7 @@ async function main() {
      * We are using the async/await language constructs of Javascript:
      *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
      */
-    const heightmapImage = await Utilities.loadImage('resources/images/heightmap.png');
+    const heightmapImage = await Utilities.loadImage('js/entities/terrain/images/heightmap.png');
     const width = 100;
 
     const simplex = new SimplexNoise();
@@ -141,18 +141,18 @@ async function main() {
         height: 20
     });
 
-    const grassTexture = new TextureLoader().load('resources/textures/grass_02.png');
+    const grassTexture = new TextureLoader().load('js/entities/terrain/textures/grass_02.png');
     grassTexture.wrapS = RepeatWrapping;
     grassTexture.wrapT = RepeatWrapping;
     grassTexture.repeat.set(5000 / width, 5000 / width);
 
-    const snowyRockTexture = new TextureLoader().load('resources/textures/snowy_rock_01.png');
+    const snowyRockTexture = new TextureLoader().load('js/entities/terrain/textures/snowy_rock_01.png');
     snowyRockTexture.wrapS = RepeatWrapping;
     snowyRockTexture.wrapT = RepeatWrapping;
     snowyRockTexture.repeat.set(1500 / width, 1500 / width);
 
 
-    const splatMap = new TextureLoader().load('resources/images/splatmap_01.png');
+    const splatMap = new TextureLoader().load('js/entities/terrain/images/splatmap_01.png');
 
     const terrainMaterial = new TextureSplattingMaterial({
         color: 0xffffff,
@@ -175,7 +175,7 @@ async function main() {
         // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
 
-    loader.load(
+    /*loader.load(
         'resources/models/banana.glb', function(gltf) {
             var model = gltf.scene;
             model.position.y = 20;
@@ -196,10 +196,10 @@ async function main() {
 
 
     );
-
+    */
     loader.load(
         // resource URL
-        'resources/models/kenney_nature_kit/tree_thin.glb',
+        'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
         //'resources/models/banana.glb',
         // called when resource is loaded
         (object) => {

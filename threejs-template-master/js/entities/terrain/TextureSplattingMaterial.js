@@ -1,5 +1,5 @@
 
-import { ShaderMaterial, Color, ShaderLib, UniformsLib, UniformsUtils } from '../lib/three.module.js';
+import { ShaderMaterial, Color, ShaderLib, UniformsLib, UniformsUtils } from '../../lib/three.module.js';
 
 import ShaderCustomiser from './ShaderCustomiser.js';
 

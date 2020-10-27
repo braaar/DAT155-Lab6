@@ -1,5 +1,5 @@
 
-import { ShaderChunk } from '../lib/three.module.js';
+import { ShaderChunk } from '../../lib/three.module.js';
 
 export default class ShaderCustomiser {
 

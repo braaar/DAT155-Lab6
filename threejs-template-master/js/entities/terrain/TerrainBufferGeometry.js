@@ -2,8 +2,8 @@
  * Terrain geometry based on PlaneBufferGeometry.
  */
 
-import Utilities from '../lib/Utilities.js';
-import { PlaneBufferGeometry } from '../lib/three.module.js';
+import Utilities from '../../lib/Utilities.js';
+import { PlaneBufferGeometry } from '../../lib/three.module.js';
 
 export default class TerrainBufferGeometry extends PlaneBufferGeometry {
 
