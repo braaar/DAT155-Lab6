@@ -50,7 +50,6 @@ async function main() {
     renderer.shadowMap.type = PCFSoftShadowMap;
     //renderer.outputEncoding = sRGBEncoding;
 
-
     /**
      * Handle window resize:
      *  - update aspect ratio.

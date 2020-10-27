@@ -21,18 +21,18 @@ export default class Movement {
 
         this.yaw = 0.0;
         this.pitch = 0.0;
-        console.log("yaw initialised to " + this.yaw);
         this.mouseSensitivity = 0.001;
 
 
+        document.addEventListener('pointerlockchange', (e) => {
+            canvas.addEventListener('mousemove', (event) => {
+                if (document.pointerLockElement === canvas){
+                    this.yaw += event.movementX * this.mouseSensitivity;
+                    this.pitch += event.movementY * this.mouseSensitivity;
+                }
 
-        document.addEventListener('pointerlockchange', () => {
-            if (document.pointerLockElement === canvas) {
-                canvas.addEventListener('mousemove', this.updateCamRotation, false);
-            } else {
-                canvas.removeEventListener('mousemove', this.updateCamRotation, false);
-            }
-        });
+            }, false)
+        }, false);
 
         this.move = {
             forward: false,
@@ -139,15 +139,4 @@ export default class Movement {
         this.yaw = 0;
         this.pitch = 0;
     }
-
-    updateCamRotation(event) {
-        console.log("mouse moved!");
-
-        this.yaw += event.movementX * this.mouseSensitivity;
-        this.pitch += event.movementY * this.mouseSensitivity;
-        //console.log(this.yaw);
-        //console.log(this.pitch);
-
-    }
-
 }
