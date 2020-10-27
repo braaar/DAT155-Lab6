@@ -27,6 +27,7 @@ import { GLTFLoader } from './lib/loaders/GLTFLoader.js';
 import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
+import Terrain from "./entities/terrain/Terrain.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -92,15 +93,6 @@ async function main() {
     let helper = new CameraHelper( directionalLight.shadow.camera );
     scene.add( helper );
 
-    /*  let geometry = new SphereGeometry(25000, 60, 60);
-      let skyTexture = new TextureLoader().load('resources/textures/sky.jpg');
-      let skyMat = new skyMaterial(skyTexture);
-
-      let skydome = new Mesh(geometry, skyMat);
-      skydome.scale.set(-1, 1, 1);
-      skydome.renderDepth = 100.0;
-      scene.add(skydome);*/
-
     var skyDomeRadius = 500.01;
     var sphereMaterial = new ShaderMaterial({
         uniforms: {
@@ -121,86 +113,21 @@ async function main() {
     var skyDome = new Mesh(sphereGeometry, sphereMaterial);
     scene.add(skyDome);
 
-    /**
-     * Add terrain:
-     *
-     * We have to wait for the image file to be loaded by the browser.
-     * There are many ways to handle asynchronous flow in your application.
-     * We are using the async/await language constructs of Javascript:
-     *  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
-     */
-    const heightmapImage = await Utilities.loadImage('js/entities/terrain/images/heightmap.png');
-    const width = 100;
-
-    const simplex = new SimplexNoise();
-    const terrainGeometry = new TerrainBufferGeometry({
-        width,
-        heightmapImage,
-        // noiseFn: simplex.noise.bind(simplex),
-        numberOfSubdivisions: 128,
-        height: 20
-    });
-
-    const grassTexture = new TextureLoader().load('js/entities/terrain/textures/grass_02.png');
-    grassTexture.wrapS = RepeatWrapping;
-    grassTexture.wrapT = RepeatWrapping;
-    grassTexture.repeat.set(5000 / width, 5000 / width);
-
-    const snowyRockTexture = new TextureLoader().load('js/entities/terrain/textures/snowy_rock_01.png');
-    snowyRockTexture.wrapS = RepeatWrapping;
-    snowyRockTexture.wrapT = RepeatWrapping;
-    snowyRockTexture.repeat.set(1500 / width, 1500 / width);
-
-
-    const splatMap = new TextureLoader().load('js/entities/terrain/images/splatmap_01.png');
-
-    const terrainMaterial = new TextureSplattingMaterial({
-        color: 0xffffff,
-        shininess: 0,
-        textures: [snowyRockTexture, grassTexture],
-        splatMaps: [splatMap]
-    });
-
-    const terrain = new Mesh(terrainGeometry, terrainMaterial);
-
-    terrain.castShadow = true;
-    terrain.receiveShadow = true;
-
-    scene.add(terrain);
+    const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap.png');
+    const terrain = new Terrain(heightmapImage, 100);
+    scene.add(terrain.mesh);
 
     /**
      * Add trees
      */
 
-        // instantiate a GLTFLoader:
+    // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
 
-    /*loader.load(
-        'resources/models/banana.glb', function(gltf) {
-            var model = gltf.scene;
-            model.position.y = 20;
 
-
-            model.traverse( function (object ) {
-                if(object.isMesh) {
-                    object.material.color.set( 0xffffff );
-                    object.castShadow = true;
-                    object.recieveShadow = true;
-                    object.material.metalness = 0;
-
-                }
-
-            });
-            scene.add(model);
-        }
-
-
-    );
-    */
     loader.load(
         // resource URL
         'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
-        //'resources/models/banana.glb',
         // called when resource is loaded
         (object) => {
             for (let x = -50; x < 50; x += 8) {
@@ -209,7 +136,7 @@ async function main() {
                     const px = x + 1 + (6 * Math.random()) - 3;
                     const pz = z + 1 + (6 * Math.random()) - 3;
 
-                    const height = terrainGeometry.getHeightAt(px, pz);
+                    const height = terrain.terrainGeometry.getHeightAt(px, pz);
 
                     if (height < 5) {
                         const tree = object.scene.children[0].clone();
@@ -318,6 +245,7 @@ async function main() {
     const velocity = new Vector3(0.0, 0.0, 0.0);
 
     let then = performance.now();
+
     function loop(now) {
 
         const delta = now - then;
@@ -336,8 +264,8 @@ async function main() {
         }
 
         if (move.forward) {
-            let above = terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1;
-            let below = terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1;
+            let above = terrain.terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1;
+            let below = terrain.terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1;
 
             if(above && below){
                 velocity.z -= moveSpeed;
