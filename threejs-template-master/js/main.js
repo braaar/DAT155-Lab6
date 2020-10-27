@@ -9,6 +9,13 @@ import {
     DirectionalLight,
     Vector3,
     AxesHelper,
+    CameraHelper,
+    sRGBEncoding,
+    SphereGeometry,
+    Color,
+    DoubleSide,
+    ShaderMaterial
+
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
@@ -18,6 +25,10 @@ import TextureSplattingMaterial from './materials/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './terrain/TerrainBufferGeometry.js';
 import { GLTFLoader } from './loaders/GLTFLoader.js';
 import { SimplexNoise } from './lib/SimplexNoise.js';
+//import skyMaterial from "./materials/skyMaterial.js";
+import StarrySkyShader from "./materials/StarrySkyShader.js";
+//import {sRGBEncoding} from "./lib/three.module";
+
 
 async function main() {
 
@@ -31,9 +42,10 @@ async function main() {
     const renderer = new WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xffffff);
     renderer.setSize(window.innerWidth, window.innerHeight);
-
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
+    //renderer.outputEncoding = sRGBEncoding;
+
 
     /**
      * Handle window resize:
@@ -57,7 +69,7 @@ async function main() {
      * Add light
      */
     const directionalLight = new DirectionalLight(0xffffff);
-    directionalLight.position.set(300, 400, 0);
+    directionalLight.position.set(300, 400, 300);
 
     directionalLight.castShadow = true;
 
@@ -70,17 +82,48 @@ async function main() {
     scene.add(directionalLight);
 
     // Set direction
-    directionalLight.target.position.set(0, 15, 0);
+    directionalLight.target.position.set(0, -10, 0);
     scene.add(directionalLight.target);
 
-    camera.position.z = 70;
-    camera.position.y = 55;
+    camera.position.z = 30;
+    camera.position.y = 5;
     camera.rotation.x -= Math.PI * 0.25;
 
+    let helper = new CameraHelper( directionalLight.shadow.camera );
+    scene.add( helper );
+
+    /*  let geometry = new SphereGeometry(25000, 60, 60);
+      let skyTexture = new TextureLoader().load('resources/textures/sky.jpg');
+      let skyMat = new skyMaterial(skyTexture);
+
+      let skydome = new Mesh(geometry, skyMat);
+      skydome.scale.set(-1, 1, 1);
+      skydome.renderDepth = 100.0;
+      scene.add(skydome);*/
+
+    var skyDomeRadius = 500.01;
+    var sphereMaterial = new ShaderMaterial({
+        uniforms: {
+            skyRadius: { value: skyDomeRadius },
+            env_c1: { value: new Color("#0d1a2f") },//#0d1a2f
+            env_c2: { value: new Color("#0f8682") },//#0f8682
+            noiseOffset: { value: new Vector3(100.01, 100.01, 100.01) },
+            starSize: { value: 0.01 },
+            starDensity: { value: 0.09 },
+            clusterStrength: { value: 0.2 },
+            clusterSize: { value: 0.2 },
+        },
+        vertexShader: StarrySkyShader.vertexShader,
+        fragmentShader: StarrySkyShader.fragmentShader,
+        side: DoubleSide,
+    })
+    var sphereGeometry = new SphereGeometry(skyDomeRadius, 20, 20);
+    var skyDome = new Mesh(sphereGeometry, sphereMaterial);
+    scene.add(skyDome);
 
     /**
      * Add terrain:
-     * 
+     *
      * We have to wait for the image file to be loaded by the browser.
      * There are many ways to handle asynchronous flow in your application.
      * We are using the async/await language constructs of Javascript:
@@ -129,17 +172,40 @@ async function main() {
      * Add trees
      */
 
-    // instantiate a GLTFLoader:
+        // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
+
+    loader.load(
+        'resources/models/banana.glb', function(gltf) {
+            var model = gltf.scene;
+            model.position.y = 20;
+
+
+            model.traverse( function (object ) {
+                if(object.isMesh) {
+                    object.material.color.set( 0xffffff );
+                    object.castShadow = true;
+                    object.recieveShadow = true;
+                    object.material.metalness = 0;
+
+                }
+
+            });
+            scene.add(model);
+        }
+
+
+    );
 
     loader.load(
         // resource URL
         'resources/models/kenney_nature_kit/tree_thin.glb',
+        //'resources/models/banana.glb',
         // called when resource is loaded
         (object) => {
             for (let x = -50; x < 50; x += 8) {
                 for (let z = -50; z < 50; z += 8) {
-                    
+
                     const px = x + 1 + (6 * Math.random()) - 3;
                     const pz = z + 1 + (6 * Math.random()) - 3;
 
@@ -154,14 +220,15 @@ async function main() {
                                 child.receiveShadow = true;
                             }
                         });
-                        
+
                         tree.position.x = px;
-                        tree.position.y = height - 0.01;
+                        tree.position.y = height + 0.3;
                         tree.position.z = pz;
 
                         tree.rotation.y = Math.random() * (2 * Math.PI);
 
                         tree.scale.multiplyScalar(1.5 + Math.random() * 1);
+                        //tree.scale.multiplyScalar(0.5);
 
                         scene.add(tree);
                     }
@@ -269,7 +336,38 @@ async function main() {
         }
 
         if (move.forward) {
-            velocity.z -= moveSpeed;
+            let above = terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1;
+            let below = terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1;
+
+            if(above && below){
+                velocity.z -= moveSpeed;
+            }
+            else if(above && !below){
+                velocity.z -= moveSpeed;
+                velocity.y -= 0.1;
+            }
+            else if(!above && below){
+                velocity.z -= moveSpeed;
+                velocity.y += 0.2;
+            }
+
+            /*if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1 &&
+                terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1) {
+                velocity.z -= moveSpeed;
+            }
+            else if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1) {
+                velocity.y += 0.1;
+            }
+            else {
+                velocity.y -= 0.1;
+            }
+            if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y+5) {
+                velocity.z -= moveSpeed;
+            }
+            else{
+                velocity.y -= 0.1;
+            }*/
+
         }
 
         if (move.backward) {
@@ -284,13 +382,12 @@ async function main() {
         // apply rotation to velocity vector, and translate moveNode with it.
         velocity.applyQuaternion(camera.quaternion);
         camera.position.add(velocity);
-
         // render scene:
         renderer.render(scene, camera);
 
         requestAnimationFrame(loop);
 
-    };
+    }
 
     loop(performance.now());
 
