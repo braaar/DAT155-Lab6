@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * Collection of general purpose utilities.
+ * oskarbraten
+ */
 export default class Utilities {
 	/**
 	 * Loads image from url.
