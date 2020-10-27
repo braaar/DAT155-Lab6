@@ -28,7 +28,10 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
+import Movement from "./controls/Movement.js";
 //import {sRGBEncoding} from "./lib/three.module";
+
+
 
 
 async function main() {
@@ -171,145 +174,19 @@ async function main() {
         }
     );
 
-    /**
-     * Set up camera controller:
-     */
 
-    const mouseLookController = new MouseLookController(camera);
 
-    // We attach a click lister to the canvas-element so that we can request a pointer lock.
-    // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API
-    const canvas = renderer.domElement;
-
-    canvas.addEventListener('click', () => {
-        canvas.requestPointerLock();
-    });
-
-    let yaw = 0;
-    let pitch = 0;
-    const mouseSensitivity = 0.001;
-
-    function updateCamRotation(event) {
-        yaw += event.movementX * mouseSensitivity;
-        pitch += event.movementY * mouseSensitivity;
-    }
-
-    document.addEventListener('pointerlockchange', () => {
-        if (document.pointerLockElement === canvas) {
-            canvas.addEventListener('mousemove', updateCamRotation, false);
-        } else {
-            canvas.removeEventListener('mousemove', updateCamRotation, false);
-        }
-    });
-
-    let move = {
-        forward: false,
-        backward: false,
-        left: false,
-        right: false,
-        speed: 0.01
-    };
-
-    window.addEventListener('keydown', (e) => {
-        if (e.code === 'KeyW') {
-            move.forward = true;
-            e.preventDefault();
-        } else if (e.code === 'KeyS') {
-            move.backward = true;
-            e.preventDefault();
-        } else if (e.code === 'KeyA') {
-            move.left = true;
-            e.preventDefault();
-        } else if (e.code === 'KeyD') {
-            move.right = true;
-            e.preventDefault();
-        }
-    });
-
-    window.addEventListener('keyup', (e) => {
-        if (e.code === 'KeyW') {
-            move.forward = false;
-            e.preventDefault();
-        } else if (e.code === 'KeyS') {
-            move.backward = false;
-            e.preventDefault();
-        } else if (e.code === 'KeyA') {
-            move.left = false;
-            e.preventDefault();
-        } else if (e.code === 'KeyD') {
-            move.right = false;
-            e.preventDefault();
-        }
-    });
-
-    const velocity = new Vector3(0.0, 0.0, 0.0);
+    let player = new Movement(camera, renderer, terrain);
 
     let then = performance.now();
-
     function loop(now) {
 
-        const delta = now - then;
-        then = now;
+        const frametime = now - then;
+        then = now; //get with the times, old man!
 
-        const moveSpeed = move.speed * delta;
 
-        velocity.set(0.0, 0.0, 0.0);
+        player.doMove(frametime);
 
-        if (move.left) {
-            velocity.x -= moveSpeed;
-        }
-
-        if (move.right) {
-            velocity.x += moveSpeed;
-        }
-
-        if (move.forward) {
-            let above = terrain.terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1;
-            let below = terrain.terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1;
-
-            if(above && below){
-                velocity.z -= moveSpeed;
-            }
-            else if(above && !below){
-                velocity.z -= moveSpeed;
-                velocity.y -= 0.1;
-            }
-            else if(!above && below){
-                velocity.z -= moveSpeed;
-                velocity.y += 0.2;
-            }
-
-            /*if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1 &&
-                terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y-1) {
-                velocity.z -= moveSpeed;
-            }
-            else if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) <= camera.position.y-1) {
-                velocity.y += 0.1;
-            }
-            else {
-                velocity.y -= 0.1;
-            }
-            if(terrainGeometry.getHeightAt(camera.position.x, camera.position.z) >= camera.position.y+5) {
-                velocity.z -= moveSpeed;
-            }
-            else{
-                velocity.y -= 0.1;
-            }*/
-
-        }
-
-        if (move.backward) {
-            velocity.z += moveSpeed;
-        }
-
-        // update controller rotation.
-        mouseLookController.update(pitch, yaw);
-        yaw = 0;
-        pitch = 0;
-
-        // apply rotation to velocity vector, and translate moveNode with it.
-        velocity.applyQuaternion(camera.quaternion);
-        camera.position.add(velocity);
         // render scene:
         renderer.render(scene, camera);
 
