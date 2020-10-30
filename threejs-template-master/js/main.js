@@ -29,6 +29,11 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
 import Movement from "./controls/Movement.js";
+import {EffectComposer} from "./postprocessing/EffectComposer.js";
+import {RenderPass} from "./postprocessing/RenderPass.js"
+import {HalftonePass} from "./postprocessing/HalftonePass.js";
+import {ShaderPass} from "./postprocessing/ShaderPass.js";
+import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -173,7 +178,47 @@ async function main() {
         }
     );
 
+    // post-processing, lagt til av brage fredag 30. oktober
 
+    let composer = new EffectComposer( renderer );
+    const renderPass = new RenderPass( scene, camera );
+    composer.addPass( renderPass );
+
+    let effectSobel = new ShaderPass( SobelOperatorShader );
+    effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
+    effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
+
+    //uncomment denne for Sobel kantlinjer
+    //composer.addPass( effectSobel );
+
+    const params = {
+        shape: 3,
+        radius: 5,
+        rotateR: Math.PI / 12,
+        rotateB: Math.PI / 12 * 2,
+        rotateG: Math.PI / 12 * 3,
+        scatter: 0,
+        blending: 1,
+        blendingMode: 1,
+        greyscale: false,
+        disable: false
+    };
+
+    const halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, params );
+    //composer.addPass( renderPass );
+
+    //uncomment denne for halftone effekt
+    //composer.addPass( halftonePass );
+
+    window.onresize = function () {
+
+        // resize composer
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        composer.setSize( window.innerWidth, window.innerHeight );
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+
+    };
 
     let player = new Movement(camera, renderer, terrain);
 
@@ -187,8 +232,8 @@ async function main() {
         player.doMove(frametime);
 
         // render scene:
-        renderer.render(scene, camera);
-
+        //renderer.render(scene, camera);
+        composer.render();
         requestAnimationFrame(loop);
 
     }
