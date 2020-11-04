@@ -29,6 +29,7 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
 import Movement from "./controls/Movement.js";
+import Gate from "./entities/gate/gate.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -125,6 +126,9 @@ async function main() {
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
+
+    var gate = new Gate(loader);
+    scene.add(gate.model);
 
 
     loader.load(
