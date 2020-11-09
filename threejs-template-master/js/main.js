@@ -132,8 +132,6 @@ async function main() {
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
-    new Gate(loader, scene);
-    new Bridge(loader, scene);
 
     loader.load(
         // resource URL
