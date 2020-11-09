@@ -29,7 +29,13 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
 import Movement from "./controls/Movement.js";
+import {EffectComposer} from "./postprocessing/EffectComposer.js";
+import {RenderPass} from "./postprocessing/RenderPass.js"
+import {HalftonePass} from "./postprocessing/HalftonePass.js";
+import {ShaderPass} from "./postprocessing/ShaderPass.js";
+import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
+import Bridge from "./entities/bridge/bridge.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -126,10 +132,6 @@ async function main() {
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
-
-    var gate = new Gate(loader);
-    scene.add(gate.model);
-
 
     loader.load(
         // resource URL
