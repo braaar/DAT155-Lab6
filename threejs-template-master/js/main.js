@@ -38,6 +38,12 @@ import {RenderPass} from "./postprocessing/RenderPass.js"
 import {HalftonePass} from "./postprocessing/HalftonePass.js";
 import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
+<<<<<<< HEAD
+=======
+import Gate from "./entities/gate/gate.js";
+import Bridge from "./entities/bridge/bridge.js";
+//import {sRGBEncoding} from "./lib/three.module";
+>>>>>>> origin/master
 
 
 
@@ -148,7 +154,6 @@ async function main() {
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
 
-
     loader.load(
         // resource URL
         'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
@@ -170,6 +175,7 @@ async function main() {
                                 child.castShadow = true;
                                 child.receiveShadow = true;
                             }
+
                         });
 
                         tree.position.x = px;
