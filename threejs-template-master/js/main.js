@@ -38,14 +38,9 @@ import {RenderPass} from "./postprocessing/RenderPass.js"
 import {HalftonePass} from "./postprocessing/HalftonePass.js";
 import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
-<<<<<<< HEAD
-=======
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
 //import {sRGBEncoding} from "./lib/three.module";
->>>>>>> origin/master
-
-
 
 
 async function main() {
