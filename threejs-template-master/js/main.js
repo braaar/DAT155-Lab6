@@ -14,7 +14,10 @@ import {
     SphereGeometry,
     Color,
     DoubleSide,
-    ShaderMaterial
+    ShaderMaterial,
+    BoxBufferGeometry,
+    MeshBasicMaterial,
+    PlaneBufferGeometry
 
 } from './lib/three.module.js';
 
@@ -28,6 +31,7 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
+//import { Water } from "./entities/water/Water.js";
 import Movement from "./controls/Movement.js";
 import {EffectComposer} from "./postprocessing/EffectComposer.js";
 import {RenderPass} from "./postprocessing/RenderPass.js"
@@ -38,8 +42,6 @@ import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
 import SkyBox from "./entities/sky/skybox.js";
 //import {sRGBEncoding} from "./lib/three.module";
-
-
 
 
 async function main() {
@@ -56,7 +58,7 @@ async function main() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = PCFSoftShadowMap;
-    //renderer.outputEncoding = sRGBEncoding;
+    renderer.outputEncoding = sRGBEncoding;
 
     /**
      * Handle window resize:
@@ -127,6 +129,20 @@ async function main() {
     const terrain = new Terrain(heightmapImage, 100);
     scene.add(terrain.mesh);
 
+
+    // add water
+    /**
+    let waterTexture = new TextureLoader().load('js/entities/water/vann2.jpg');
+    let waterGeo = new PlaneBufferGeometry( 5, 20, 32 );
+    let waterMaterial = new MeshBasicMaterial( {
+        map: waterTexture
+    } );
+    let plane = new Mesh( waterGeo, waterMaterial );
+    plane.position.y = 50;
+    scene.add(plane);
+     */
+
+
     /**
      * Add trees
      */
@@ -162,7 +178,7 @@ async function main() {
 
                         tree.rotation.y = Math.random() * (2 * Math.PI);
 
-                        tree.scale.multiplyScalar(1.5 + Math.random() * 1);
+                        tree.scale.multiplyScalar(1.5 + Math.random());
                         //tree.scale.multiplyScalar(0.5);
 
                         scene.add(tree);
