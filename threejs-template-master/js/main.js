@@ -36,6 +36,7 @@ import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
+import SkyBox from "./entities/sky/skybox.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -102,8 +103,8 @@ async function main() {
     let helper = new CameraHelper( directionalLight.shadow.camera );
     scene.add( helper );
 
-    var skyDomeRadius = 500.01;
-    var sphereMaterial = new ShaderMaterial({
+   // var skyDomeRadius = 500.01;
+   /* var sphereMaterial = new ShaderMaterial({
         uniforms: {
             skyRadius: { value: skyDomeRadius },
             env_c1: { value: new Color("#0d1a2f") },//#0d1a2f
@@ -120,7 +121,7 @@ async function main() {
     })
     var sphereGeometry = new SphereGeometry(skyDomeRadius, 20, 20);
     var skyDome = new Mesh(sphereGeometry, sphereMaterial);
-    scene.add(skyDome);
+    scene.add(skyDome);*/
 
     const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap.png');
     const terrain = new Terrain(heightmapImage, 100);
@@ -132,7 +133,6 @@ async function main() {
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
-
     loader.load(
         // resource URL
         'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
