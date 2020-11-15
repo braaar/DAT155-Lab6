@@ -23,7 +23,7 @@ import {
 
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
-
+import ParticleSystem from "./entities/particles/Particles.js";
 import TextureSplattingMaterial from './entities/terrain/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './entities/terrain/TerrainBufferGeometry.js';
 import { GLTFLoader } from './lib/loaders/GLTFLoader.js';
@@ -141,6 +141,13 @@ async function main() {
     scene.add(plane);
      */
 
+    // add light particles
+
+    let lightParticle = new ParticleSystem({
+            parent: scene,
+            camera: camera
+        });
+
 
     /**
      * Add trees
@@ -246,6 +253,7 @@ async function main() {
         const frametime = now - then;
         then = now; //get with the times, old man!
 
+        lightParticle.Step(frametime);
 
         player.doMove(frametime);
 

@@ -5,15 +5,17 @@ import {
     Float32BufferAttribute, Points,
     ShaderMaterial,
     TextureLoader, Vector3
-} from "../../lib/three.module";
+} from "../../lib/three.module.js";
 
 const _VS = `
 uniform float pointMultiplier;
 attribute float size;
 attribute float angle;
 attribute vec4 colour;
+
 varying vec4 vColour;
 varying vec2 vAngle;
+
 void main() {
   vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
   gl_Position = projectionMatrix * mvPosition;
@@ -32,46 +34,17 @@ void main() {
 }`;
 
 /////////////////////////////////////////////////////////////////////
-class LinearSpline {
-    constructor(lerp) {
-        this._points = [];
-        this._lerp = lerp;
-    }
 
-    AddPoint(t, d) {
-        this._points.push([t, d]);
-    }
 
-    Get(t) {
-        let p1 = 0;
+export default class ParticleSystem {
+    constructor(params, camera) {
 
-        for (let i = 0; i < this._points.length; i++) {
-            if (this._points[i][0] >= t) {
-                break;
-            }
-            p1 = i;
-        }
+        this._particles = [];
+        this._camera = camera;
 
-        const p2 = Math.min(this._points.length - 1, p1 + 1);
-
-        if (p1 == p2) {
-            return this._points[p1][1];
-        }
-
-        return this._lerp(
-            (t - this._points[p1][0]) / (
-            this._points[p2][0] - this._points[p1][0]),
-            this._points[p1][1], this._points[p2][1]);
-    }
-}
-/////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////
-class ParticleSystem {
-    constructor(params) {
         const uniforms = {
             diffuseTexture: {
-                value: new TextureLoader().load('./particle.jpg')
+                value: new TextureLoader().load('./js/entities/particles/particle.jpg')
             },
             pointMultiplier: {
                 value: window.innerHeight / (2.0 * Math.tan(0.5 * 60.0 * Math.PI / 180.0))
@@ -102,31 +75,24 @@ class ParticleSystem {
 
         this._AddParticles();
         this._UpdateGeometry();
+
     }
 
-    _AddParticles(timeElapsed) {
-
-        if (!this.gdfsghk) {
-            this.gdfsghk = 0.0;
-        }
-        this.gdfsghk += timeElapsed;
-        const n = Math.floor(this.gdfsghk * 75.0);
-        this.gdfsghk -= n / 75.0;
-
-        for (let i = 0; i < 10; i++) {
-            const life = (Math.random() * 0.75 + 0.25) * 10.0;
+    _AddParticles() {
+        for (let i = 0; i < 100; i++) {
+            const life = (Math.random() * 1000 + 0.25) * 10.0;
             this._particles.push({
                 position: new Vector3(
-                    (Math.random() * 2 - 1) * 1.0,
-                    (Math.random() * 2 - 1) * 1.0,
-                    (Math.random() * 2 - 1) * 1.0),
-                size: (Math.random() * 0.5 + 0.5) * 4.0,
-                colour: new Color(),
+                    (Math.random() * -500 + 20) * 1.0,
+                    (Math.random() * 25 - 10) * 1.0,
+                    (Math.random() * -500 + 20) * 1.0),
+                size: 0.7,
+                colour: new Color(1.0, 0.0, 1.0),
                 alpha: 1.0,
                 life: life,
                 maxLife: life,
                 rotation: Math.random() * 2.0 * Math.PI,
-                velocity: new Vector3(0, -15, 0),
+                brightness: 5.0
             });
         }
     }
@@ -140,7 +106,7 @@ class ParticleSystem {
         for (let p of this._particles) {
             positions.push(p.position.x, p.position.y, p.position.z);
             colours.push(p.colour.r, p.colour.g, p.colour.b, p.alpha);
-            sizes.push(p.currentSize);
+            sizes.push(p.size);
             angles.push(p.rotation);
         }
 
@@ -169,18 +135,13 @@ class ParticleSystem {
         });
 
         for (let p of this._particles) {
-            const t = 1.0 - p.life / p.maxLife;
-
-            p.rotation += timeElapsed * 0.5;
-            p.alpha = this._alphaSpline.Get(t);
-            p.currentSize = p.size * this._sizeSpline.Get(t);
-            p.colour.copy(this._colourSpline.Get(t));
-
+            p.rotation += timeElapsed * 1.0;
         }
 
+        /**
         this._particles.sort((a, b) => {
-            const d1 = this.camera.position.distanceTo(a.position);
-            const d2 = this.camera.position.distanceTo(b.position);
+            const d1 = this._camera.position.distanceToSquared(a.position);
+            const d2 = this._camera.position.distanceToSquared(b.position);
 
             if (d1 > d2) {
                 return -1;
@@ -191,15 +152,23 @@ class ParticleSystem {
             }
 
             return 0;
-        });
+        }); */
     }
 
     Step(timeElapsed) {
-        this._AddParticles(timeElapsed);
         this._UpdateParticles(timeElapsed);
+        this._UpdateGeometry();
+
+        wait();
+
+        this._AddParticles();
         this._UpdateGeometry();
     }
 
 
+
 }
-/////////////////////////////////////////////////////////////////////
+const delay = ms => new Promise(res => setTimeout(res, ms));
+const wait = async () => {
+    await delay(5000);
+};
