@@ -32,7 +32,6 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
-//import { Water } from "./js/entities/water/Water.js";
 import Movement from "./controls/Movement.js";
 import {EffectComposer} from "./postprocessing/EffectComposer.js";
 import {RenderPass} from "./postprocessing/RenderPass.js"
@@ -131,6 +130,7 @@ async function main() {
 
 
     // add water
+
 
     // add light particles
     let lightParticle = new ParticleSystem({
