@@ -49,6 +49,7 @@ import {Fog} from "./lib/three.module.js";
 import {FogExp2} from "./lib/three.module.js";
 import Bush from "./entities/bush/bush.js";
 import Sakura from "./entities/sakura/sakura.js";
+import Water2 from "./entities/water/Water2.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -132,7 +133,9 @@ async function main() {
 
 
     // add water
-
+    let water = new Water2({
+        parent: scene
+    });
 
     // add light particles
     let lightParticle = new ParticleSystem({
@@ -249,11 +252,12 @@ async function main() {
     //let rain = new Rain(scene);
 
     let then = performance.now();
+
     function loop(now) {
 
         const frametime = now - then;
         then = now; //get with the times, old man!
-
+        water.update(now/10000);
         //rain.animate();
         lightParticle.Step(frametime);
 
