@@ -17,7 +17,13 @@ import {
     ShaderMaterial,
     BoxBufferGeometry,
     MeshBasicMaterial,
-    PlaneBufferGeometry
+    PlaneBufferGeometry,
+    WebGLRenderTarget,
+    RGBFormat,
+    DepthTexture,
+    UnsignedShortType,
+    NearestFilter,
+    DepthStencilFormat
 
 } from './lib/three.module.js';
 
@@ -40,6 +46,8 @@ import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
+import {FogShader} from "./postprocessing/FogShader.js";
+
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -225,6 +233,34 @@ async function main() {
     const halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, params );
     //composer.addPass( renderPass );
 
+    let target = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
+    target.texture.format = RGBFormat;
+    target.texture.minFilter = NearestFilter;
+    target.texture.magFilter = NearestFilter;
+    target.texture.generateMipmaps = false;
+    target.stencilBuffer = false;
+    target.depthBuffer = true;
+    target.depthTexture = new DepthTexture();
+    target.depthTexture.type = UnsignedShortType;
+
+    const fogPass = new ShaderPass(FogShader);
+    fogPass.uniforms.cameraNear.value = camera.near;
+    fogPass.uniforms.cameraFar.value = camera.far;
+    fogPass.uniforms.tDepth.value = target.depthTexture;
+    fogPass.uniforms.fogColor.value = (0.502, 0.0, 0.125);
+    fogPass.uniforms.fogCap.value = 0.6;
+    fogPass.uniforms.minFogThreshhold.value = 0.05;
+    fogPass.uniforms.maxFogThreshhold.value = 4.0;
+
+    composer.addPass(fogPass);
+
+    let render = function( )
+    {
+        renderer.setRenderTarget( target  );
+        renderer.render( scene, camera );
+        //renderer.setRenderTarget( null );
+    };
+
     //uncomment denne for halftone effekt
     //composer.addPass( halftonePass );
 
@@ -235,6 +271,10 @@ async function main() {
         composer.setSize( window.innerWidth, window.innerHeight );
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
+
+        //resize redenderdepth-renderTarget (used for fog post processing)
+        const dpr = renderer.getPixelRatio();
+        target.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
 
     };
 
@@ -251,6 +291,7 @@ async function main() {
 
         // render scene:
         //renderer.render(scene, camera);
+        render()
         composer.render();
         requestAnimationFrame(loop);
 
