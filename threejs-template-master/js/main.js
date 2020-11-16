@@ -18,7 +18,13 @@ import {
     BoxBufferGeometry,
     MeshBasicMaterial,
     PlaneBufferGeometry,
-    NormalBlending, ImageUtils, CubeRefractionMapping
+    WebGLRenderTarget,
+    RGBFormat,
+    DepthTexture,
+    UnsignedShortType,
+    NearestFilter,
+    DepthStencilFormat,
+    NormalBlending, ImageUtils, CubeRefractionMapping, AmbientLight, PointLight, PointLightHelper, FogExp2, Fog
 
 } from './lib/three.module.js';
 
@@ -40,15 +46,13 @@ import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
+import {FogShader} from "./postprocessing/FogShader.js";
 import SkyBox from "./entities/sky/skybox.js";
 import Cloud from "./entities/sky/cloud.js";
 import Rain from "./entities/sky/rain.js";
-import {PointLight} from "./lib/three.module.js";
-import {PointLightHelper} from "./lib/three.module.js";
-import {Fog} from "./lib/three.module.js";
-import {FogExp2} from "./lib/three.module.js";
 import Bush from "./entities/bush/bush.js";
 import Sakura from "./entities/sakura/sakura.js";
+import BumpedCrate from "./entities/BumpedCrate/bumpedCrate.js";
 import Water2 from "./entities/water/Water2.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
@@ -74,12 +78,19 @@ async function main() {
      *  - update aspect ratio.
      *  - update projection matrix
      *  - update renderer size
+     *  - update composer size
+     *  - update renderDepth-renderTarget
      */
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
+        // resize composer
+        composer.setSize( window.innerWidth, window.innerHeight );
+        //resize redenderdepth-renderTarget (used for fog post processing)
+        const dpr = renderer.getPixelRatio();
+        depthRender.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
     }, false);
 
     /**
@@ -90,8 +101,11 @@ async function main() {
     /**
      * Add light
      */
+    //ambient
+    let ambientLight = new AmbientLight(0x1a1a00,0.5);
+    scene.add(ambientLight);
     //const directionalLight = new DirectionalLight(0xffffff);
-    const directionalLight = new PointLight(0xad331a, 1.0, 100);
+    const directionalLight = new PointLight(0xffffff, 1.0, 100);
     //directionalLight.position.set(300, 400, 300);
     directionalLight.position.y = 35;
 
@@ -111,27 +125,25 @@ async function main() {
 
 
     camera.position.z = 30;
-    camera.position.y = 5;
+    camera.position.y = 13;
     camera.rotation.x -= Math.PI * 0.25;
 
     let helper = new CameraHelper( directionalLight.shadow.camera );
-    scene.add( helper );
+    //scene.add( helper );
     const pointLightHelper = new PointLightHelper( directionalLight, 1 );
-    scene.add( pointLightHelper );
-
-
-
-
-
+    //scene.add( pointLightHelper );
 
     const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap2.png');
     const terrain = new Terrain(heightmapImage, 100);
     scene.add(terrain.mesh);
 
     let skybox = new SkyBox(scene,0);
-    scene.fog = new FogExp2(0x33322f, 0.1);
+    scene.fog = new FogExp2(0x1a001a, 0.07);
 
 
+    //add box
+    let myCrate = new BumpedCrate(scene);
+    myCrate.position.set(0,14,22);
     // add water
     let water = new Water2({
         parent: scene
@@ -143,60 +155,6 @@ async function main() {
             camera: camera
         });
 
-
-    /**
-     * Add trees
-     *
-     *
-     */
-    /*
-     loader.load(
-            // resource URL
-            'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
-            // called when resource is loaded
-            (object) => {
-                for (let x = -50; x < 50; x += 8) {
-                    for (let z = -50; z < 50; z += 8) {
-
-                        const px = x + 1 + (6 * Math.random()) - 3;
-                        const pz = z + 1 + (6 * Math.random()) - 3;
-
-                        const height = terrain.terrainGeometry.getHeightAt(px, pz);
-
-                        if (height < 5) {
-                            const tree = object.scene.children[0].clone();
-
-                            tree.traverse((child) => {
-                                if (child.isMesh) {
-                                    child.castShadow = true;
-                                    child.receiveShadow = true;
-                                }
-                            });
-
-                            tree.position.x = px;
-                            tree.position.y = height + 0.3;
-                            tree.position.z = pz;
-
-                            tree.rotation.y = Math.random() * (2 * Math.PI);
-
-                            tree.scale.multiplyScalar(1.5 + Math.random());
-                            //tree.scale.multiplyScalar(0.5);
-
-                            scene.add(tree);
-                        }
-
-                    }
-                }
-            },
-            (xhr) => {
-                console.log(((xhr.loaded / xhr.total) * 100) + '% loaded');
-            },
-            (error) => {
-                console.error('Error loading model.', error);
-            }
-        );
-     */
-
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
     new Gate(loader, terrain.mesh);
@@ -206,47 +164,70 @@ async function main() {
     new Sakura(scene,terrain);
 
 
-    // post-processing, lagt til av brage fredag 30. oktober
+    // post-processing
+    /**
+     * rendrer scenen til et renderTarget
+     * brukes for å skaffe dybdedata til fod-effect
+     */
+    let render = function(renderTarget)
+    {
+        renderer.setRenderTarget(renderTarget);
+        renderer.render(scene, camera );
+        //renderer.setRenderTarget( null );
+    };
 
-    let composer = new EffectComposer( renderer );
-    const renderPass = new RenderPass( scene, camera );
-    composer.addPass( renderPass );
-
+    //set up sobel effect
     let effectSobel = new ShaderPass( SobelOperatorShader );
     effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
     effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 
-    //uncomment denne for Sobel kantlinjer
-    //composer.addPass( effectSobel );
-
+    //set up halftone effect
     const params = {
-        shape: 3,
-        radius: 5,
+        shape: 2,
+        radius: 2,
         rotateR: Math.PI / 12,
         rotateB: Math.PI / 12 * 2,
         rotateG: Math.PI / 12 * 3,
         scatter: 0,
-        blending: 1,
+        blending: 0.4,
         blendingMode: 1,
         greyscale: false,
         disable: false
     };
 
     const halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, params );
-    //composer.addPass( renderPass );
 
-    //uncomment denne for halftone effekt
-    //composer.addPass( halftonePass );
+    //set up depthRenderTarget and fog effect
+    let depthRender = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
+    depthRender.texture.format = RGBFormat;
+    depthRender.texture.minFilter = NearestFilter;
+    depthRender.texture.magFilter = NearestFilter;
+    depthRender.texture.generateMipmaps = false;
+    depthRender.stencilBuffer = false;
+    depthRender.depthBuffer = true;
+    depthRender.depthTexture = new DepthTexture();
+    depthRender.depthTexture.type = UnsignedShortType;
 
-    window.onresize = function () {
+    const fogPass = new ShaderPass(FogShader);
+    fogPass.uniforms.cameraNear.value = camera.near;
+    fogPass.uniforms.cameraFar.value = camera.far;
+    fogPass.uniforms.tDepth.value = depthRender.depthTexture;
+    fogPass.uniforms.fogColor.value = (0.502, 0.0, 0.125);
+    fogPass.uniforms.fogCap.value = 0.6;
+    fogPass.uniforms.minFogThreshhold.value = 0.05;
+    fogPass.uniforms.maxFogThreshhold.value = 4.0;
 
-        // resize composer
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        composer.setSize( window.innerWidth, window.innerHeight );
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
+    //set up composer
+    let composer = new EffectComposer( renderer );
+    const renderPass = new RenderPass( scene, camera );
 
-    };
+    //add renderpass of the main screen
+    composer.addPass( renderPass );
+
+    //add fog
+    composer.addPass(fogPass);
+    //add halftone effect
+    composer.addPass( halftonePass );
 
     let player = new Movement(camera, renderer, terrain);
     //let rain = new Rain(scene);
@@ -265,6 +246,7 @@ async function main() {
 
         // render scene:
         //renderer.render(scene, camera);
+        render(depthRender)
         composer.render();
 
         requestAnimationFrame(loop);

@@ -3,7 +3,7 @@ import {
     Mesh, MeshPhongMaterial, TextureLoader
 } from "../../lib/three.module.js";
 
-export default class Bridge {
+export default class BumpedCrate {
     constructor(scene) {
 
 
