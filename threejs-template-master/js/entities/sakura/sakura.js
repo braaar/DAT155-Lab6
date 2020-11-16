@@ -1,5 +1,5 @@
 import {GLTFLoader} from "../../lib/loaders/GLTFLoader.js";
-import {Sprite, Vector3} from "../../lib/three.module.js";
+import {Color, MeshPhongMaterial, MeshToonMaterial, Sprite, Vector3} from "../../lib/three.module.js";
 
 
 export default class Sakura {
@@ -10,12 +10,34 @@ export default class Sakura {
            function (object) {
             let model = object.scene;
 
-               model.traverse((child) => {
-                   if (child.isMesh) {
-                       child.castShadow = true;
-                       child.receiveShadow = true;
+
+
+            let leaves = model.children[0].children[0];
+            let trunk = model.children[0].children[1];
+
+
+               let changeMat = function (m){
+                   if(m.isMesh){
+                       //m.material.displacementScale =
+                       m.material = new MeshPhongMaterial();
+                       m.castShadow = true;
+                       m.receiveShadow = true;
+
+                       //m.metalness = 0.99;
+                       //console.log(m.parent);
+                   } else {
+                       //console.log('is not mesh');
                    }
-               });
+               }
+               //console.log(leaves.material)
+
+               changeMat(leaves);
+               console.log(leaves.material)
+               changeMat(trunk);
+
+               leaves.material.color = new Color(1,0,1);
+               trunk.material.color = new Color(1,0.5,0);
+               //console.log(model.children[0].children[0]);
                let treeList = [];
 
                for(let i=0; i< 20; i++){
@@ -47,7 +69,8 @@ export default class Sakura {
 
                }
                treeList.forEach(g => {
-                   terrain.mesh.add(g);
+                   //terrain.mesh.add(g);
+                   scene.add(g);
                });
 
 
