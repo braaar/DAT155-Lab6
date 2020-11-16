@@ -1,12 +1,15 @@
+import {Raycaster} from "../../lib/three.module.js";
+
 export default class Bridge {
+
     constructor(loader,scene) {
         this.loader = loader;
         this.loader.load(
             'js/entities/bridge/scene.gltf',
             function (gltf)  {
                 let model = gltf.scene;
-                model.scale.multiplyScalar(10);
-                model.position.y = 12;
+                model.scale.multiplyScalar(20);
+                model.position.y = 15;
                 model.position.z = -5;
 
                 model.traverse( function (object ) {
@@ -21,4 +24,5 @@ export default class Bridge {
             }
         );
     }
+
 }

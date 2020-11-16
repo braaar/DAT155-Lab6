@@ -1,6 +1,6 @@
 
 export default class Gate {
-    constructor(loader,scene) {
+    constructor(loader,terrain) {
         this.loader = loader;
         this.loader.load(
             'js/entities/gate/scene.gltf',
@@ -16,7 +16,8 @@ export default class Gate {
                         object.material.metalness = 0;
                     }
                 });
-                scene.add(model);
+                //model.mesh.raycast()
+                terrain.add(model);
             }
         );
     }
