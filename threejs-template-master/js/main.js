@@ -40,7 +40,16 @@ import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
-import Water2 from "./entities/water/Water2.js";
+import SkyBox from "./entities/sky/skybox.js";
+import Cloud from "./entities/sky/cloud.js";
+import Rain from "./entities/sky/rain.js";
+import {PointLight} from "./lib/three.module.js";
+import {PointLightHelper} from "./lib/three.module.js";
+import {Fog} from "./lib/three.module.js";
+import {FogExp2} from "./lib/three.module.js";
+import Bush from "./entities/bush/bush.js";
+import Sakura from "./entities/sakura/sakura.js";
+//import {sRGBEncoding} from "./lib/three.module";
 
 
 async function main() {
@@ -80,8 +89,10 @@ async function main() {
     /**
      * Add light
      */
-    const directionalLight = new DirectionalLight(0xffffff);
-    directionalLight.position.set(300, 400, 300);
+    //const directionalLight = new DirectionalLight(0xffffff);
+    const directionalLight = new PointLight(0xad331a, 1.0, 100);
+    //directionalLight.position.set(300, 400, 300);
+    directionalLight.position.y = 35;
 
     directionalLight.castShadow = true;
 
@@ -91,11 +102,12 @@ async function main() {
     directionalLight.shadow.camera.near = 0.5;
     directionalLight.shadow.camera.far = 2000;
 
-    scene.add(directionalLight);
 
     // Set direction
-    directionalLight.target.position.set(0, -10, 0);
-    scene.add(directionalLight.target);
+   // directionalLight.target.position.set(0, -10, 0);
+    //scene.add(directionalLight.target);
+    scene.add(directionalLight);
+
 
     camera.position.z = 30;
     camera.position.y = 5;
@@ -103,30 +115,20 @@ async function main() {
 
     let helper = new CameraHelper( directionalLight.shadow.camera );
     scene.add( helper );
+    const pointLightHelper = new PointLightHelper( directionalLight, 1 );
+    scene.add( pointLightHelper );
 
-    var skyDomeRadius = 500.01;
-    var sphereMaterial = new ShaderMaterial({
-        uniforms: {
-            skyRadius: { value: skyDomeRadius },
-            env_c1: { value: new Color("#0d1a2f") },//#0d1a2f
-            env_c2: { value: new Color("#0f8682") },//#0f8682
-            noiseOffset: { value: new Vector3(100.01, 100.01, 100.01) },
-            starSize: { value: 0.01 },
-            starDensity: { value: 0.09 },
-            clusterStrength: { value: 0.2 },
-            clusterSize: { value: 0.2 },
-        },
-        vertexShader: StarrySkyShader.vertexShader,
-        fragmentShader: StarrySkyShader.fragmentShader,
-        side: DoubleSide,
-    })
-    var sphereGeometry = new SphereGeometry(skyDomeRadius, 20, 20);
-    var skyDome = new Mesh(sphereGeometry, sphereMaterial);
-    scene.add(skyDome);
 
-    const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap.png');
+
+
+
+
+    const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap2.png');
     const terrain = new Terrain(heightmapImage, 100);
     scene.add(terrain.mesh);
+
+    let skybox = new SkyBox(scene,0);
+    scene.fog = new FogExp2(0x33322f, 0.1);
 
 
     // add water
@@ -141,57 +143,65 @@ async function main() {
 
     /**
      * Add trees
+     *
+     *
+     */
+    /*
+     loader.load(
+            // resource URL
+            'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
+            // called when resource is loaded
+            (object) => {
+                for (let x = -50; x < 50; x += 8) {
+                    for (let z = -50; z < 50; z += 8) {
+
+                        const px = x + 1 + (6 * Math.random()) - 3;
+                        const pz = z + 1 + (6 * Math.random()) - 3;
+
+                        const height = terrain.terrainGeometry.getHeightAt(px, pz);
+
+                        if (height < 5) {
+                            const tree = object.scene.children[0].clone();
+
+                            tree.traverse((child) => {
+                                if (child.isMesh) {
+                                    child.castShadow = true;
+                                    child.receiveShadow = true;
+                                }
+                            });
+
+                            tree.position.x = px;
+                            tree.position.y = height + 0.3;
+                            tree.position.z = pz;
+
+                            tree.rotation.y = Math.random() * (2 * Math.PI);
+
+                            tree.scale.multiplyScalar(1.5 + Math.random());
+                            //tree.scale.multiplyScalar(0.5);
+
+                            scene.add(tree);
+                        }
+
+                    }
+                }
+            },
+            (xhr) => {
+                console.log(((xhr.loaded / xhr.total) * 100) + '% loaded');
+            },
+            (error) => {
+                console.error('Error loading model.', error);
+            }
+        );
      */
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
+    new Gate(loader, terrain.mesh);
 
-    loader.load(
-        // resource URL
-        'js/entities/sakura/kenney_nature_kit/tree_thin.glb',
-        // called when resource is loaded
-        (object) => {
-            for (let x = -50; x < 50; x += 8) {
-                for (let z = -50; z < 50; z += 8) {
+    new Bridge(loader,scene);
+    new Bush(scene,terrain);
+    new Sakura(scene,terrain);
 
-                    const px = x + 1 + (6 * Math.random()) - 3;
-                    const pz = z + 1 + (6 * Math.random()) - 3;
-
-                    const height = terrain.terrainGeometry.getHeightAt(px, pz);
-
-                    if (height < 5) {
-                        const tree = object.scene.children[0].clone();
-
-                        tree.traverse((child) => {
-                            if (child.isMesh) {
-                                child.castShadow = true;
-                                child.receiveShadow = true;
-                            }
-
-                        });
-
-                        tree.position.x = px;
-                        tree.position.y = height + 0.3;
-                        tree.position.z = pz;
-
-                        tree.rotation.y = Math.random() * (2 * Math.PI);
-
-                        tree.scale.multiplyScalar(1.5 + Math.random());
-                        //tree.scale.multiplyScalar(0.5);
-
-                        scene.add(tree);
-                    }
-
-                }
-            }
-        },
-        (xhr) => {
-            console.log(((xhr.loaded / xhr.total) * 100) + '% loaded');
-        },
-        (error) => {
-            console.error('Error loading model.', error);
-        }
-    );
 
     // post-processing, lagt til av brage fredag 30. oktober
 
@@ -236,6 +246,7 @@ async function main() {
     };
 
     let player = new Movement(camera, renderer, terrain);
+    //let rain = new Rain(scene);
 
     let then = performance.now();
     function loop(now) {
@@ -243,6 +254,7 @@ async function main() {
         const frametime = now - then;
         then = now; //get with the times, old man!
 
+        //rain.animate();
         lightParticle.Step(frametime);
 
         player.doMove(frametime);
@@ -250,8 +262,8 @@ async function main() {
         // render scene:
         //renderer.render(scene, camera);
         composer.render();
-        requestAnimationFrame(loop);
 
+        requestAnimationFrame(loop);
     }
 
     loop(performance.now());
