@@ -135,7 +135,7 @@
       "uri": "textures/torii_baseColor.png"
     },
     {
-      "uri": "textures/torii_normal.png"
+      "uri": "textures/normalmap2.jpg"
     }
   ],
   "materials": [
