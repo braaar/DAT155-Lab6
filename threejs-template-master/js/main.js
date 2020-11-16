@@ -18,7 +18,7 @@ import {
     BoxBufferGeometry,
     MeshBasicMaterial,
     PlaneBufferGeometry,
-    NormalBlending, ImageUtils, CubeRefractionMapping
+    NormalBlending, ImageUtils, CubeRefractionMapping, AmbientLight
 
 } from './lib/three.module.js';
 
@@ -50,6 +50,7 @@ import {Fog} from "./lib/three.module.js";
 import {FogExp2} from "./lib/three.module.js";
 import Bush from "./entities/bush/bush.js";
 import Sakura from "./entities/sakura/sakura.js";
+import BumpedCrate from "./entities/BumpedCrate/bumpedCrate.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -90,8 +91,11 @@ async function main() {
     /**
      * Add light
      */
+    //ambient
+    let ambientLight = new AmbientLight(0x1a1a00,0.2);
+    scene.add(ambientLight);
     //const directionalLight = new DirectionalLight(0xffffff);
-    const directionalLight = new PointLight(0xad331a, 1.0, 100);
+    const directionalLight = new PointLight(0xffffff, 1.0, 100);
     //directionalLight.position.set(300, 400, 300);
     directionalLight.position.y = 35;
 
@@ -115,9 +119,9 @@ async function main() {
     camera.rotation.x -= Math.PI * 0.25;
 
     let helper = new CameraHelper( directionalLight.shadow.camera );
-    scene.add( helper );
+    //scene.add( helper );
     const pointLightHelper = new PointLightHelper( directionalLight, 1 );
-    scene.add( pointLightHelper );
+    //scene.add( pointLightHelper );
 
 
 
@@ -129,9 +133,12 @@ async function main() {
     scene.add(terrain.mesh);
 
     let skybox = new SkyBox(scene,0);
-    scene.fog = new FogExp2(0x33322f, 0.1);
+    scene.fog = new FogExp2(0x1a001a, 0.07);
 
 
+    //add box
+    let myCrate = new BumpedCrate(scene);
+    myCrate.position.set(0,14,22);
     // add water
 
     // add light particles
@@ -217,13 +224,13 @@ async function main() {
     //composer.addPass( effectSobel );
 
     const params = {
-        shape: 3,
-        radius: 5,
+        shape: 2,
+        radius: 2,
         rotateR: Math.PI / 12,
         rotateB: Math.PI / 12 * 2,
         rotateG: Math.PI / 12 * 3,
         scatter: 0,
-        blending: 1,
+        blending: 0.4,
         blendingMode: 1,
         greyscale: false,
         disable: false
@@ -233,7 +240,7 @@ async function main() {
     //composer.addPass( renderPass );
 
     //uncomment denne for halftone effekt
-    //composer.addPass( halftonePass );
+    composer.addPass( halftonePass );
 
     window.onresize = function () {
 
