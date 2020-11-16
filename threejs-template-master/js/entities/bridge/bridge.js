@@ -1,4 +1,4 @@
-import {Raycaster} from "../../lib/three.module.js";
+import {MeshPhongMaterial, Raycaster} from "../../lib/three.module.js";
 
 export default class Bridge {
 
@@ -14,10 +14,11 @@ export default class Bridge {
 
                 model.traverse( function (object ) {
                     if (object.isMesh) {
-                        object.material.color.set(0xffffff);
+                        object.material = new MeshPhongMaterial();
+                        object.material.color.set(0x692009);
                         object.castShadow = true;
                         object.recieveShadow = true;
-                        object.material.metalness = 0;
+                        //object.material.metalness = 0;
                     }
                 });
                 scene.add(model);
