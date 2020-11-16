@@ -99,7 +99,7 @@ async function main() {
      * Add light
      */
     //ambient
-    let ambientLight = new AmbientLight(0x1a1a00,0.2);
+    let ambientLight = new AmbientLight(0x1a1a00,0.5);
     scene.add(ambientLight);
     //const directionalLight = new DirectionalLight(0xffffff);
     const directionalLight = new PointLight(0xffffff, 1.0, 100);
@@ -122,7 +122,7 @@ async function main() {
 
 
     camera.position.z = 30;
-    camera.position.y = 5;
+    camera.position.y = 13;
     camera.rotation.x -= Math.PI * 0.25;
 
     let helper = new CameraHelper( directionalLight.shadow.camera );
@@ -218,7 +218,6 @@ async function main() {
 
 
     // post-processing, lagt til av brage fredag 30. oktober
-
     let render = function( )
     {
         renderer.setRenderTarget(target);

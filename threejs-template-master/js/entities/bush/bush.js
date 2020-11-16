@@ -11,12 +11,14 @@ export default class Bush {
             map:texture,
             transparent: true,
             color: 0xffffff,
+            depthWrite: false
         });
         let texture1 = loader.load('js/entities/bush/textures/sprites/n_grass_diff_0_31.png');
         let material1 = new SpriteMaterial({
             map:texture1,
             transparent: true,
             color: 0xffffff,
+            depthWrite: false
         });
 
         let grassList = [];
@@ -49,6 +51,7 @@ export default class Bush {
             grass.position.x = pos.x;
             grass.position.y = pos.y;
             grass.position.z = pos.z;
+            grass.fog = true;
             grassList[i] = grass;
 
         }
