@@ -79,15 +79,15 @@ export default class ParticleSystem {
     }
 
     _AddParticles() {
-        for (let i = 0; i < 100; i++) {
+        for (let i = 0; i < 1; i++) {
             const life = (Math.random() * 1000 + 0.25) * 10.0;
             this._particles.push({
                 position: new Vector3(
-                    (Math.random() * -500 + 20) * 1.0,
-                    (Math.random() * 25 - 10) * 1.0,
-                    (Math.random() * -500 + 20) * 1.0),
+                    (Math.random() * 100 - 50) * 1.0,
+                    (Math.random() * 25 - 5) * 1.0,
+                    (Math.random() * 100 - 50) * 1.0),
                 size: 0.7,
-                colour: new Color(1.0, 0.0, 1.0),
+                colour: new Color(0.0, 0.8, 1.0),
                 alpha: 1.0,
                 life: life,
                 maxLife: life,
@@ -138,6 +138,7 @@ export default class ParticleSystem {
             p.rotation += timeElapsed * 1.0;
         }
 
+
         /**
         this._particles.sort((a, b) => {
             const d1 = this._camera.position.distanceToSquared(a.position);
@@ -152,7 +153,8 @@ export default class ParticleSystem {
             }
 
             return 0;
-        }); */
+        });
+         */
     }
 
     Step(timeElapsed) {

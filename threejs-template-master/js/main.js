@@ -17,7 +17,8 @@ import {
     ShaderMaterial,
     BoxBufferGeometry,
     MeshBasicMaterial,
-    PlaneBufferGeometry
+    PlaneBufferGeometry,
+    NormalBlending, ImageUtils, CubeRefractionMapping
 
 } from './lib/three.module.js';
 
@@ -31,7 +32,7 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
-//import { Water } from "./entities/water/Water.js";
+//import { Water } from "./js/entities/water/Water.js";
 import Movement from "./controls/Movement.js";
 import {EffectComposer} from "./postprocessing/EffectComposer.js";
 import {RenderPass} from "./postprocessing/RenderPass.js"
@@ -40,7 +41,7 @@ import {ShaderPass} from "./postprocessing/ShaderPass.js";
 import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
-//import {sRGBEncoding} from "./lib/three.module";
+import Water2 from "./entities/water/Water2.js";
 
 
 async function main() {
@@ -130,19 +131,8 @@ async function main() {
 
 
     // add water
-    /**
-    let waterTexture = new TextureLoader().load('js/entities/water/vann2.jpg');
-    let waterGeo = new PlaneBufferGeometry( 5, 20, 32 );
-    let waterMaterial = new MeshBasicMaterial( {
-        map: waterTexture
-    } );
-    let plane = new Mesh( waterGeo, waterMaterial );
-    plane.position.y = 50;
-    scene.add(plane);
-     */
 
     // add light particles
-
     let lightParticle = new ParticleSystem({
             parent: scene,
             camera: camera
