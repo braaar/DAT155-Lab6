@@ -17,13 +17,14 @@ import {
     ShaderMaterial,
     BoxBufferGeometry,
     MeshBasicMaterial,
-    PlaneBufferGeometry
+    PlaneBufferGeometry,
+    NormalBlending, ImageUtils, CubeRefractionMapping
 
 } from './lib/three.module.js';
 
 import Utilities from './lib/Utilities.js';
 import MouseLookController from './controls/MouseLookController.js';
-
+import ParticleSystem from "./entities/particles/Particles.js";
 import TextureSplattingMaterial from './entities/terrain/TextureSplattingMaterial.js';
 import TerrainBufferGeometry from './entities/terrain/TerrainBufferGeometry.js';
 import { GLTFLoader } from './lib/loaders/GLTFLoader.js';
@@ -31,7 +32,7 @@ import { SimplexNoise } from './lib/SimplexNoise.js';
 //import skyMaterial from "./materials/skyMaterial.js";
 import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
-//import { Water } from "./entities/water/Water.js";
+//import { Water } from "./js/entities/water/Water.js";
 import Movement from "./controls/Movement.js";
 import {EffectComposer} from "./postprocessing/EffectComposer.js";
 import {RenderPass} from "./postprocessing/RenderPass.js"
@@ -132,16 +133,12 @@ async function main() {
 
 
     // add water
-    /**
-    let waterTexture = new TextureLoader().load('js/entities/water/vann2.jpg');
-    let waterGeo = new PlaneBufferGeometry( 5, 20, 32 );
-    let waterMaterial = new MeshBasicMaterial( {
-        map: waterTexture
-    } );
-    let plane = new Mesh( waterGeo, waterMaterial );
-    plane.position.y = 50;
-    scene.add(plane);
-     */
+
+    // add light particles
+    let lightParticle = new ParticleSystem({
+            parent: scene,
+            camera: camera
+        });
 
 
     /**
@@ -258,6 +255,8 @@ async function main() {
         then = now; //get with the times, old man!
 
         //rain.animate();
+        lightParticle.Step(frametime);
+
         player.doMove(frametime);
 
         // render scene:
