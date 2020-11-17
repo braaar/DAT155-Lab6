@@ -7,6 +7,7 @@ export default class Gate {
             function (gltf)  {
                 let model = gltf.scene;
                 model.scale.multiplyScalar(0.05);
+                model.position.y = 10;
 
                 model.traverse( function (object ) {
                     if (object.isMesh) {
