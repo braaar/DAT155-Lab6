@@ -138,12 +138,12 @@ async function main() {
     scene.add(terrain.mesh);
 
     let skybox = new SkyBox(scene,0);
-    scene.fog = new FogExp2(0x1a001a, 0.07);
+    //scene.fog = new FogExp2(0x1a001a, 0.07);
 
 
     //add box
     let myCrate = new BumpedCrate(scene);
-    myCrate.position.set(0,14,22);
+    myCrate.position.set(15,14,22);
     // add water
     let water = new Water2({
         parent: scene

@@ -46,8 +46,11 @@ export default class Bush {
             else{
                 grass = new Sprite(material1);
             }
+            if(pos.y <= 9){
+                i--;
+                continue;
+            }
 
-            //grass.scale.multiplyScalar(3);
             grass.position.x = pos.x;
             grass.position.y = pos.y;
             grass.position.z = pos.z;
