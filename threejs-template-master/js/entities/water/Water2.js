@@ -27,7 +27,7 @@ let uniforms = [];
 uniforms.time = { type: "f", value: 0.1 };
 uniforms.envMap = { type: "t", value: 1, texture: textureCube};
 
-let waterTexture = new TextureLoader().load('./js/entities/water/water.jpg');
+let waterTexture = new TextureLoader().load('./js/entities/water/water2.jpg');
 uniforms.texture2 = { type: "t", value: waterTexture};
 uniforms.texture2.value.wrapS = uniforms.texture2.value.wrapT = RepeatWrapping;
 uniforms.texture2.value.repeat.set(25, 25);
@@ -140,7 +140,7 @@ export default class Water2 {
             blending: AdditiveBlending
         });
 
-        let waterGeo = new PlaneBufferGeometry( 40, 40, 40, 40 );
+        let waterGeo = new PlaneBufferGeometry( 40, 40, 10, 10 );
 
         this.wPlane = new Mesh (waterGeo, this.material);
         this.wPlane.doubleSide = true;
@@ -151,7 +151,7 @@ export default class Water2 {
 
     }
     update (time) {
-        this.wPlane.material.uniforms.time = time;
+        this.wPlane.material.uniforms.time.value = time;
 
     }
 }
