@@ -54,6 +54,7 @@ import Bush from "./entities/bush/bush.js";
 import Sakura from "./entities/sakura/sakura.js";
 import BumpedCrate from "./entities/BumpedCrate/bumpedCrate.js";
 import Water2 from "./entities/water/Water2.js";
+import Water3 from "./entities/water/Water3.js";
 //import {sRGBEncoding} from "./lib/three.module";
 
 
@@ -145,9 +146,8 @@ async function main() {
     let myCrate = new BumpedCrate(scene);
     myCrate.position.set(15,14,22);
     // add water
-    let water = new Water2({
-        parent: scene
-    });
+    let water = new Water3(scene,camera);
+
 
     // add light particles
     let lightParticle = new ParticleSystem({
@@ -238,7 +238,7 @@ async function main() {
 
         const frametime = now - then;
         then = now; //get with the times, old man!
-        water.update(now/10000);
+        water.update();
         //rain.animate();
         lightParticle.Step(frametime);
 
