@@ -10,7 +10,7 @@ export default class Bridge {
                 let model = gltf.scene;
                 model.scale.multiplyScalar(20);
                 model.position.y = 15;
-                model.position.z = -5;
+                model.position.z = 0;
 
                 model.traverse( function (object ) {
                     if (object.isMesh) {
