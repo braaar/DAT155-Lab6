@@ -6,7 +6,7 @@ export default class Gate {
             'js/entities/gate/scene.gltf',
             function (gltf)  {
                 let model = gltf.scene;
-                model.scale.multiplyScalar(0.05);
+                model.scale.multiplyScalar(0.08);
                 model.position.y = 10;
 
                 model.traverse( function (object ) {

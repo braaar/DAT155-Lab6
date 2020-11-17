@@ -116,13 +116,13 @@ export default class Water3 {
         } );
         var water = new Mesh( water_geometry, water_material );
         water.rotation.x = -Math.PI/2;
-        water.position.y = -1;
+
 
         water.uniforms = uniforms;
         water.material = water_material;
 
         this.water = water;
-        water.position.setY(8);
+        water.position.setY(9);
         scene.add(water)
         console.log(water);
 
