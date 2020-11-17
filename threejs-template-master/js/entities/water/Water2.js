@@ -151,7 +151,7 @@ export default class Water2 {
 
     }
     update (time) {
-        this.wPlane.material.uniforms.time = time;
+        this.wPlane.material.uniforms.time.value = time;
 
     }
 }
