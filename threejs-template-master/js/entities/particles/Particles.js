@@ -86,13 +86,13 @@ export default class ParticleSystem {
                     (Math.random() * 100 - 50) * 1.0,
                     (Math.random() * 25 - 5) * 1.0,
                     (Math.random() * 100 - 50) * 1.0),
-                size: 0.7,
-                colour: new Color(0.1, 0.7, 1.0),
+                size: 0.8,
+                colour: new Color(0.0, 0.7, 1.0),
                 alpha: 1.0,
                 life: life,
                 maxLife: life,
                 rotation: Math.random() * 2.0 * Math.PI,
-                brightness: 5.0
+                brightness: 10.0
             });
         }
     }
