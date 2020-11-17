@@ -58,7 +58,9 @@ export default class Sakura {
                    let pos = new Vector3(newX, terrain.terrainGeometry.getHeightAt(newX, newZ),newZ );
                    let ran = Math.random();
                    let tree = object.scene.children[0].clone();
-                   tree.scale.multiplyScalar(6);
+                   tree.scale.multiplyScalar(12);
+
+                   tree.rotateOnWorldAxis(new Vector3(0,1,0),Math.random()*2*Math.PI);
 
                    if(pos.y <= 9){
                        i--;

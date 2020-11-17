@@ -90,6 +90,8 @@ export default class Movement {
         }
 
         if (this.move.forward) {
+            this.velocity.z -= moveSpeed;
+            /*
             let above = this.terrain.terrainGeometry.getHeightAt(this.camera.position.x, this.camera.position.z) <= this.camera.position.y-1;
             let below = this.terrain.terrainGeometry.getHeightAt(this.camera.position.x, this.camera.position.z) >= this.camera.position.y-1;
 

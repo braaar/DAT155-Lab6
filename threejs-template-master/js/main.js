@@ -212,10 +212,10 @@ async function main() {
     fogPass.uniforms.cameraNear.value = camera.near;
     fogPass.uniforms.cameraFar.value = camera.far;
     fogPass.uniforms.tDepth.value = depthRender.depthTexture;
-    fogPass.uniforms.fogColor.value = (0.502, 0.0, 0.125);
+    fogPass.uniforms.fogColor.value = new Vector3(1.0, 0.5, 0.0);
     fogPass.uniforms.fogCap.value = 0.6;
-    fogPass.uniforms.minFogThreshhold.value = 0.05;
-    fogPass.uniforms.maxFogThreshhold.value = 4.0;
+    fogPass.uniforms.minFogThreshhold.value = 0.0;
+    fogPass.uniforms.maxFogThreshhold.value = 20.0;
 
     //set up composer
     let composer = new EffectComposer( renderer );

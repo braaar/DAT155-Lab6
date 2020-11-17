@@ -2,6 +2,8 @@
  * Full-screen textured quad shader
  */
 
+import {Vector3} from "../lib/three.module.js";
+
 var FogShader = {
 
     uniforms: {
@@ -11,7 +13,7 @@ var FogShader = {
         "cameraNear": {value: null},
         "cameraFar": {value: null},
         "tDepth": {value: null},
-        "fogColor": {value: (0.502, 0.0, 0.125)},
+        "fogColor": {value: new Vector3(0.502, 0.0, 0.125)},
         "fogCap": {value: 0.9},
         "minFogThreshhold": {value: 0.5},
         "maxFogThreshhold": {value: 4.0}
@@ -60,7 +62,7 @@ var FogShader = {
                 ff = clamp(ff, 0.0, 1.0);
                 fogFactor = mix(0.0, fogCap, ff);
             }
-            gl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.502, 0.0, 0.125), fogFactor);
+            gl_FragColor.rgb = mix(gl_FragColor.rgb, fogColor, fogFactor);
         } 
         `
 };
