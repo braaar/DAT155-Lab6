@@ -3,40 +3,21 @@ import {
     WebGLRenderer,
     PCFSoftShadowMap,
     Scene,
-    Mesh,
-    TextureLoader,
-    RepeatWrapping,
-    DirectionalLight,
     Vector3,
-    AxesHelper,
-    CameraHelper,
     sRGBEncoding,
-    SphereGeometry,
-    Color,
-    DoubleSide,
-    ShaderMaterial,
-    BoxBufferGeometry,
-    MeshBasicMaterial,
-    PlaneBufferGeometry,
     WebGLRenderTarget,
     RGBFormat,
     DepthTexture,
     UnsignedShortType,
     NearestFilter,
-    DepthStencilFormat,
-    NormalBlending, ImageUtils, CubeRefractionMapping, AmbientLight, PointLight, PointLightHelper, FogExp2, Fog
+    AmbientLight,
+    PointLight,
+    PointLightHelper,
 
 } from './lib/three.module.js';
-
 import Utilities from './lib/Utilities.js';
-import MouseLookController from './controls/MouseLookController.js';
 import ParticleSystem from "./entities/particles/Particles.js";
-import TextureSplattingMaterial from './entities/terrain/TextureSplattingMaterial.js';
-import TerrainBufferGeometry from './entities/terrain/TerrainBufferGeometry.js';
 import { GLTFLoader } from './lib/loaders/GLTFLoader.js';
-import { SimplexNoise } from './lib/SimplexNoise.js';
-//import skyMaterial from "./materials/skyMaterial.js";
-import StarrySkyShader from "./entities/sky/StarrySkyShader.js";
 import Terrain from "./entities/terrain/Terrain.js";
 import Movement from "./controls/Movement.js";
 import {EffectComposer} from "./postprocessing/EffectComposer.js";
@@ -48,24 +29,25 @@ import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
 import {FogShader} from "./postprocessing/FogShader.js";
 import SkyBox from "./entities/sky/skybox.js";
-import Cloud from "./entities/sky/cloud.js";
-import Rain from "./entities/sky/rain.js";
 import Bush from "./entities/bush/bush.js";
 import Sakura from "./entities/sakura/sakura.js";
 import BumpedCrate from "./entities/BumpedCrate/bumpedCrate.js";
-import Water2 from "./entities/water/Water2.js";
 import Water3 from "./entities/water/Water3.js";
-//import {sRGBEncoding} from "./lib/three.module";
+
 
 
 async function main() {
 
     const scene = new Scene();
 
-    const axesHelper = new AxesHelper(15);
-    scene.add(axesHelper);
+    //const axesHelper = new AxesHelper(15);
+    //scene.add(axesHelper);
 
     const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 30;
+    camera.position.y = 13;
+    camera.rotation.x -= Math.PI * 0.25;
+
 
     const renderer = new WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xffffff);
@@ -100,69 +82,72 @@ async function main() {
     document.body.appendChild(renderer.domElement);
 
     /**
-     * Add light
+     * Ambient light
      */
-    //ambient
     let ambientLight = new AmbientLight(0x1a1a00,0.5);
     scene.add(ambientLight);
-    //const directionalLight = new DirectionalLight(0xffffff);
-    const directionalLight = new PointLight(0xffffff, 1.0, 100);
-    //directionalLight.position.set(300, 400, 300);
-    directionalLight.position.y = 35;
 
-    directionalLight.castShadow = true;
+    /**
+     * Point light
+     */
+    const pointLight = new PointLight(0xffffff, 1.0, 100);
+    pointLight.position.y = 35;
+    pointLight.castShadow = true;
 
     //Set up shadow properties for the light
-    directionalLight.shadow.mapSize.width = 512;
-    directionalLight.shadow.mapSize.height = 512;
-    directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 2000;
+    pointLight.shadow.mapSize.width = 512;
+    pointLight.shadow.mapSize.height = 512;
+    pointLight.shadow.camera.near = 0.5;
+    pointLight.shadow.camera.far = 2000;
+    scene.add(pointLight);
 
+    /**
+     * Shows the position of the point light
+     */
+    const pointLightHelper = new PointLightHelper( pointLight, 1 );
+    scene.add( pointLightHelper );
 
-    // Set direction
-   // directionalLight.target.position.set(0, -10, 0);
-    //scene.add(directionalLight.target);
-    scene.add(directionalLight);
-
-
-    camera.position.z = 30;
-    camera.position.y = 13;
-    camera.rotation.x -= Math.PI * 0.25;
-
-    let helper = new CameraHelper( directionalLight.shadow.camera );
-    //scene.add( helper );
-    const pointLightHelper = new PointLightHelper( directionalLight, 1 );
-    //scene.add( pointLightHelper );
-
+    /**
+     * Terrain
+     */
     const heightmapImage =  await Utilities.loadImage('js/entities/terrain/images/heightmap2.png');
     const terrain = new Terrain(heightmapImage, 100);
     scene.add(terrain.mesh);
 
-    let skybox = new SkyBox(scene,0);
-    //scene.fog = new FogExp2(0x1a001a, 0.07);
-
-
-    //add box
-    let myCrate = new BumpedCrate(scene);
-    myCrate.position.set(15,14,22);
-    // add water
-    let water = new Water3(scene,camera);
-
-
-    // add light particles
-    let lightParticle = new ParticleSystem({
-            parent: scene,
-            camera: camera
-        });
+    /**
+     * Skybox
+     */
+    new SkyBox(scene,0);
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();
-    new Gate(loader, terrain.mesh);
-
-    new Bridge(loader,scene);
+    /**
+     * Instantiation of models
+     */
+    new Gate(loader, terrain);
+    new Bridge(loader,terrain);
     new Bush(scene,terrain);
     new Sakura(scene,terrain);
+    let myCrate = new BumpedCrate(scene);
+    myCrate.position.set(15,14,22);
 
+    /**
+     * Movement
+     */
+    let player = new Movement(camera, renderer, terrain);
+
+    /**
+     * Water
+     */
+    let water = new Water3(scene,camera);
+
+    /**
+     * Lightparticles
+     */
+    let lightParticle = new ParticleSystem({
+        parent: scene,
+        camera: camera
+    });
 
     // post-processing
     /**
@@ -229,8 +214,7 @@ async function main() {
     //add halftone effect
     composer.addPass( halftonePass );
 
-    let player = new Movement(camera, renderer, terrain);
-    //let rain = new Rain(scene);
+
 
     let then = performance.now();
 
@@ -239,7 +223,6 @@ async function main() {
         const frametime = now - then;
         then = now; //get with the times, old man!
         water.update();
-        //rain.animate();
         lightParticle.Step(frametime);
 
         player.doMove(frametime);

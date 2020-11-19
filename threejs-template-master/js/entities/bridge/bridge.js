@@ -21,7 +21,7 @@ export default class Bridge {
                         //object.material.metalness = 0;
                     }
                 });
-                scene.add(model);
+                scene.mesh.add(model);
             }
         );
     }

@@ -74,8 +74,7 @@ export default class Sakura {
 
                }
                treeList.forEach(g => {
-                   //terrain.mesh.add(g);
-                   scene.add(g);
+                   terrain.mesh.add(g);
                });
 
 

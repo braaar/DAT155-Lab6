@@ -18,7 +18,7 @@ export default class Gate {
                     }
                 });
                 //model.mesh.raycast()
-                terrain.add(model);
+                terrain.mesh.add(model);
             }
         );
     }
