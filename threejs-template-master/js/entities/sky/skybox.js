@@ -4,8 +4,8 @@ import {ShaderMaterial, SphereGeometry} from "../../lib/three.module.js";
 
 
 export default class SkyBox {
-    constructor(scene,time) {
-        if (time == 0) {
+    constructor(scene) {
+
             scene.background = new CubeTextureLoader()
                 .setPath('js/entities/sky/skybox1/')
                 .load([
@@ -16,28 +16,7 @@ export default class SkyBox {
                     'front.png',
                     'back.png'
                 ]);
-        }
-        else {
-            scene.background = new CubeTextureLoader()
-                .setPath('js/entities/sky/skybox/')
-                .load([
-                    'right.jpg',
-                    'left.jpg',
-                    'up.jpg',
-                    'down.jpg',
-                    'front.jpg',
-                    'back.jpg'
-                ]);
-
-
-        }
-
-
-
     }
-
-
-
 }
 
 

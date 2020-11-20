@@ -117,7 +117,7 @@ async function main() {
     /**
      * Skybox
      */
-    new SkyBox(scene,0);
+    new SkyBox(scene);
 
     // instantiate a GLTFLoader:
     const loader = new GLTFLoader();

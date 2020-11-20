@@ -1,5 +1,5 @@
 import {GLTFLoader} from "../../lib/loaders/GLTFLoader.js";
-import {Color, MeshPhongMaterial, MeshToonMaterial, Sprite, Vector3} from "../../lib/three.module.js";
+import {Color, MeshPhongMaterial, Vector3} from "../../lib/three.module.js";
 
 
 export default class Sakura {
@@ -10,11 +10,8 @@ export default class Sakura {
            function (object) {
             let model = object.scene;
 
-
-
             let leaves = model.children[0].children[0];
             let trunk = model.children[0].children[1];
-
 
                let changeMat = function (m){
                    if(m.isMesh){
@@ -40,8 +37,8 @@ export default class Sakura {
                //console.log(model.children[0].children[0]);
                let treeList = [];
 
-               for(let i=0; i< 15; i++){
-                   let mindist = 60;
+               for(let i=0; i< 10; i++){
+                   let mindist = 30;
                    let r1 = Math.random(); //random point between 0 and 1
                    let r2 = Math.random();
                    let r3 = Math.random();
@@ -53,35 +50,25 @@ export default class Sakura {
                    //the new point is generated around the point (x, y, z)
                    let point = new Vector3()
                    let  newX = point.x + radius * Math.cos(angle1) * Math.sin(angle2);
-                   let  newY = point.y + radius * Math.sin(angle1) * Math.sin(angle2);
                    let  newZ = point.z + radius * Math.cos(angle2);
                    let pos = new Vector3(newX, terrain.terrainGeometry.getHeightAt(newX, newZ),newZ );
-                   let ran = Math.random();
                    let tree = object.scene.children[0].clone();
                    tree.scale.multiplyScalar(12);
-
                    tree.rotateOnWorldAxis(new Vector3(0,1,0),Math.random()*2*Math.PI);
+                   tree.position.copy(pos);
 
                    if(pos.y <= 9){
                        i--;
                        continue;
                    }
-                   //grass.scale.multiplyScalar(3);
-                   tree.position.x = pos.x;
-                   tree.position.y = pos.y;
-                   tree.position.z = pos.z;
+                   const tooClose = (a) => a.position.distanceTo(tree.position) < 10;
+                   if(treeList.some(tooClose)){
+                       i--;
+                       continue;
+                   }
                    treeList[i] = tree;
-
+                   terrain.mesh.add(tree);
                }
-               treeList.forEach(g => {
-                   terrain.mesh.add(g);
-               });
-
-
-
-
            });
     }
-
-
 }
