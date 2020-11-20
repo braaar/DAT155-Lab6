@@ -127,7 +127,7 @@ async function main() {
     new Bridge(loader,terrain);
     new Bush(scene,terrain);
     new Sakura(scene,terrain);
-    let myCrate = new BumpedCrate(scene);
+    let myCrate = new BumpedCrate(terrain);
     myCrate.position.set(15,14,22);
 
     /**
@@ -138,7 +138,7 @@ async function main() {
     /**
      * Water
      */
-    let water = new Water3(scene,camera);
+    let water = new Water3(terrain);
 
     /**
      * Lightparticles
@@ -157,7 +157,6 @@ async function main() {
     {
         renderer.setRenderTarget(renderTarget);
         renderer.render(scene, camera );
-        //renderer.setRenderTarget( null );
     };
 
     //set up halftone effect

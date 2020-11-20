@@ -52,4 +52,8 @@ export default class Terrain {
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
     }
+
+    add(child) {
+        this.mesh.add(child);
+    }
 }
