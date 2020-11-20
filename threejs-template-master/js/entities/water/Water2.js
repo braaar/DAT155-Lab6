@@ -147,7 +147,7 @@ export default class Water2 {
         this.wPlane.rotation.x = -1.570796;
         this.wPlane.position.y = 8;
 
-        params.parent.add(this.wPlane);
+        params.add(this.wPlane);
 
     }
     update (time) {
