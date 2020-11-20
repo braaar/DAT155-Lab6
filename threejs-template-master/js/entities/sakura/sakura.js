@@ -46,7 +46,7 @@ export default class Sakura {
                    tree.rotateOnWorldAxis(new Vector3(0,1,0),Math.random()*2*Math.PI);
                    tree.position.copy(pos);
 
-                   if(pos.y <= 9){
+                   if(pos.y <= 9.5){
                        i--;
                        continue;
                    }

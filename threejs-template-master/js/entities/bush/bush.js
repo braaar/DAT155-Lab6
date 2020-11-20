@@ -5,14 +5,14 @@ import {Vector3} from "../../lib/three.module.js";
 export default class Bush {
     constructor(scene,terrain) {
         let loader = new TextureLoader();
-        let texture = loader.load('js/entities/bush/textures/sprites/n_grass_diff_0_01.png');
+        let texture = loader.load('js/entities/bush/textures/n_grass_diff_0_01.png');
         let material = new SpriteMaterial({
             map:texture,
             transparent: true,
             color: 0xffffff,
             depthWrite: false
         });
-        let texture1 = loader.load('js/entities/bush/textures/sprites/n_grass_diff_0_31.png');
+        let texture1 = loader.load('js/entities/bush/textures/n_grass_diff_0_31.png');
         let material1 = new SpriteMaterial({
             map:texture1,
             transparent: true,
@@ -45,12 +45,11 @@ export default class Bush {
             else{
                 grass = new Sprite(material1);
             }
-            if(pos.y <= 9){
+            if(pos.y <= 9.5){
                 i--;
                 continue;
             }
             grass.position.copy(pos);
-            grass.fog = true;
             grassList[i] = grass;
             terrain.mesh.add(grass);
         }
