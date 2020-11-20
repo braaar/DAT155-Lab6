@@ -24,7 +24,6 @@ import {EffectComposer} from "./postprocessing/EffectComposer.js";
 import {RenderPass} from "./postprocessing/RenderPass.js"
 import {HalftonePass} from "./postprocessing/HalftonePass.js";
 import {ShaderPass} from "./postprocessing/ShaderPass.js";
-import {SobelOperatorShader} from "./postprocessing/SobelOperatorShader.js";
 import Gate from "./entities/gate/gate.js";
 import Bridge from "./entities/bridge/bridge.js";
 import {FogShader} from "./postprocessing/FogShader.js";
@@ -160,11 +159,6 @@ async function main() {
         renderer.render(scene, camera );
         //renderer.setRenderTarget( null );
     };
-
-    //set up sobel effect
-    let effectSobel = new ShaderPass( SobelOperatorShader );
-    effectSobel.uniforms[ 'resolution' ].value.x = window.innerWidth * window.devicePixelRatio;
-    effectSobel.uniforms[ 'resolution' ].value.y = window.innerHeight * window.devicePixelRatio;
 
     //set up halftone effect
     const params = {
