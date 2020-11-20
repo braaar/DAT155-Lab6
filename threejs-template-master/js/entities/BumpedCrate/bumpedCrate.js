@@ -4,8 +4,8 @@ import {
 } from "../../lib/three.module.js";
 
 export default class BumpedCrate {
-    constructor(scene) {
 
+    constructor(scene) {
 
         let textureLoader = new TextureLoader();
         let crateTexture = textureLoader.load('js/entities/BumpedCrate/textures/crate0_diffuse.png');
@@ -21,7 +21,6 @@ export default class BumpedCrate {
                 normalMap:crateNormalMap
             })
         );
-
 
         scene.add(crate);
         crate.receiveShadow = true;

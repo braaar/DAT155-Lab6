@@ -39,9 +39,6 @@ async function main() {
 
     const scene = new Scene();
 
-    //const axesHelper = new AxesHelper(15);
-    //scene.add(axesHelper);
-
     const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.z = 30;
     camera.position.y = 13;
@@ -68,9 +65,7 @@ async function main() {
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
-        // resize composer
         composer.setSize( window.innerWidth, window.innerHeight );
-        //resize redenderdepth-renderTarget (used for fog post processing)
         const dpr = renderer.getPixelRatio();
         depthRender.setSize( window.innerWidth * dpr, window.innerHeight * dpr );
     }, false);
@@ -118,16 +113,16 @@ async function main() {
      */
     new SkyBox(scene);
 
-    // instantiate a GLTFLoader:
-    const loader = new GLTFLoader();
+
     /**
      * Instantiation of models
      */
+    const loader = new GLTFLoader();
     new Gate(loader, terrain);
     new Bridge(loader,terrain);
     new Bush(scene,terrain);
     new Sakura(scene,terrain);
-    let myCrate = new BumpedCrate(scene);
+    let myCrate = new BumpedCrate(terrain);
     myCrate.position.set(15,14,22);
 
     /**
@@ -138,7 +133,7 @@ async function main() {
     /**
      * Water
      */
-    let water = new Water3(scene,camera);
+    let water = new Water3(terrain);
 
     /**
      * Lightparticles
@@ -148,19 +143,15 @@ async function main() {
         camera: camera
     });
 
-    // post-processing
     /**
-     * rendrer scenen til et renderTarget
-     * brukes for å skaffe dybdedata til fod-effect
+     * Post-prosessering
      */
-    let render = function(renderTarget)
-    {
-        renderer.setRenderTarget(renderTarget);
-        renderer.render(scene, camera );
-        //renderer.setRenderTarget( null );
-    };
 
-    //set up halftone effect
+
+
+    /**
+     * Set up halftone effect
+     */
     const params = {
         shape: 2,
         radius: 2,
@@ -176,7 +167,9 @@ async function main() {
 
     const halftonePass = new HalftonePass( window.innerWidth, window.innerHeight, params );
 
-    //set up depthRenderTarget and fog effect
+    /**
+     * set up depthRenderTarget and fog effect
+     */
     let depthRender = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
     depthRender.texture.format = RGBFormat;
     depthRender.texture.minFilter = NearestFilter;
@@ -196,22 +189,32 @@ async function main() {
     fogPass.uniforms.minFogThreshhold.value = 0.0;
     fogPass.uniforms.maxFogThreshhold.value = 20.0;
 
-    //set up composer
+    /**
+     * Set up composer
+     */
     let composer = new EffectComposer( renderer );
     const renderPass = new RenderPass( scene, camera );
 
-    //add renderpass of the main screen
     composer.addPass( renderPass );
-
-    //add fog
     composer.addPass(fogPass);
-    //add halftone effect
     composer.addPass( halftonePass );
-
 
 
     let then = performance.now();
 
+    /**
+     * Metode som rendrer scenen til et renderTarget
+     * brukes for å skaffe dybdedata til fog-effect
+     */
+    let render = function(renderTarget)
+    {
+        renderer.setRenderTarget(renderTarget);
+        renderer.render(scene, camera );
+    };
+
+    /**
+     * Scene render loop
+     */
     function loop(now) {
 
         const frametime = now - then;
@@ -220,9 +223,6 @@ async function main() {
         lightParticle.Step(frametime);
 
         player.doMove(frametime);
-
-        // render scene:
-        //renderer.render(scene, camera);
         render(depthRender)
         composer.render();
 
