@@ -1,8 +1,8 @@
-import {MeshPhongMaterial, Raycaster} from "../../lib/three.module.js";
+import {MeshPhongMaterial} from "../../lib/three.module.js";
 
 export default class Bridge {
 
-    constructor(loader,scene) {
+    constructor(loader,terrain) {
         this.loader = loader;
         this.loader.load(
             'js/entities/bridge/scene.gltf',
@@ -18,10 +18,9 @@ export default class Bridge {
                         object.material.color.set(0x692009);
                         object.castShadow = true;
                         object.recieveShadow = true;
-                        //object.material.metalness = 0;
                     }
                 });
-                scene.mesh.add(model);
+                terrain.mesh.add(model);
             }
         );
     }

@@ -9,32 +9,21 @@ export default class Sakura {
        loader.load('js/entities/sakura/tree_thin.glb',
            function (object) {
             let model = object.scene;
-
             let leaves = model.children[0].children[0];
             let trunk = model.children[0].children[1];
 
                let changeMat = function (m){
                    if(m.isMesh){
-                       //m.material.displacementScale =
                        m.material = new MeshPhongMaterial();
                        m.castShadow = true;
                        m.receiveShadow = true;
-
-                       //m.metalness = 0.99;
-                       //console.log(m.parent);
-                   } else {
-                       //console.log('is not mesh');
                    }
                }
-               //console.log(leaves.material)
-
                changeMat(leaves);
-               console.log(leaves.material)
                changeMat(trunk);
 
                leaves.material.color = new Color(1,0,1);
                trunk.material.color = new Color(1,0.5,0);
-               //console.log(model.children[0].children[0]);
                let treeList = [];
 
                for(let i=0; i< 10; i++){

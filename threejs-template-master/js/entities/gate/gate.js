@@ -17,7 +17,6 @@ export default class Gate {
                         object.material.metalness = 0;
                     }
                 });
-                //model.mesh.raycast()
                 terrain.mesh.add(model);
             }
         );
